@@ -15,16 +15,18 @@ import java.util.*;
  **/
 public class UserInfo {
 
-    public static final Map<String, User> USER_MAP;
+    /**
+     * 登录的时候，存入缓存？
+     * key: 生成的 token
+     * value: 用户信息
+     */
+    public static final Map<String, User> USER_MAP = new HashMap<>();
 
-    public static final Map<String, Set<String>> ROLES;
-
-    static {
-        USER_MAP = new HashMap<>();
-        USER_MAP.put("login", new User("yui", "123465"));
-
-        ROLES = new HashMap<>();
-        ROLES.put("yui", new HashSet<>(Collections.singletonList("admin")));
-    }
+    /**
+     * 登录后，从数据库中获得权限，存入缓存？
+     * key: 用户名
+     * value: 权限（可以有多个）
+     */
+    public static final Map<String, Set<String>> ROLES_MAP = new HashMap<>();
 
 }

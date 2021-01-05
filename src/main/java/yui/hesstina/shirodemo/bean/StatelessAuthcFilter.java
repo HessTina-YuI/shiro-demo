@@ -1,14 +1,15 @@
 package yui.hesstina.shirodemo.bean;
 
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.filter.AccessControlFilter;
-import org.springframework.util.ObjectUtils;
+import java.io.IOException;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.filter.AccessControlFilter;
+import org.springframework.util.ObjectUtils;
 
 /**
  * 拦截器
@@ -21,7 +22,7 @@ import java.io.IOException;
  **/
 public class StatelessAuthcFilter extends AccessControlFilter {
 
-    private static final String HEAD_TOKEN = "token";
+    private static final String HEAD_TOKEN = "X-Access-Token";
 
     @Override
     protected boolean isAccessAllowed(ServletRequest servletRequest, ServletResponse servletResponse, Object o) throws Exception {
@@ -50,6 +51,7 @@ public class StatelessAuthcFilter extends AccessControlFilter {
             return false;
         }
 
+        // 权限判断是否能使用资源，先这么写，看看能不能改成 aop 或者别的方式
         if (subject.hasRole("admin")) {
             System.out.println("admin");
         }

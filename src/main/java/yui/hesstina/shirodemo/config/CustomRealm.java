@@ -35,7 +35,7 @@ public class CustomRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         String userName = (String) principalCollection.getPrimaryPrincipal();
 
-        Set<String> roles = UserInfo.ROLES.get(userName);
+        Set<String> roles = UserInfo.ROLES_MAP.get(userName);
         if (ObjectUtils.isEmpty(roles)) {
             return null;
         }
