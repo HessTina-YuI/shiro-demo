@@ -12,6 +12,7 @@ import org.springframework.util.ObjectUtils;
 import yui.hesstina.shirodemo.bean.StatelessToken;
 import yui.hesstina.shirodemo.constant.UserInfo;
 import yui.hesstina.shirodemo.pojo.User;
+import yui.hesstina.shirodemo.util.JwtUtils;
 
 import java.util.Set;
 
@@ -46,8 +47,17 @@ public class CustomRealm extends AuthorizingRealm {
     }
 
     @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken)
+            throws AuthenticationException {
         StatelessToken token = (StatelessToken) authenticationToken;
+        if (token == null || token.getToken() == null) {
+            return null;
+        }
+
+        if (!JwtUtils.verify(token.getToken())) {
+            return null;
+        }
+
         User user = UserInfo.USER_MAP.get(token.getToken());
         if (ObjectUtils.isEmpty(user)) {
             return null;

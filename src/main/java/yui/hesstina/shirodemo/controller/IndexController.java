@@ -1,15 +1,15 @@
 package yui.hesstina.shirodemo.controller;
 
-import java.util.Collections;
-import java.util.HashSet;
-
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import yui.hesstina.shirodemo.constant.UserInfo;
 import yui.hesstina.shirodemo.pojo.User;
+import yui.hesstina.shirodemo.util.JwtUtils;
+
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * @package yui.hesstina.shirodemo.controller
@@ -26,11 +26,11 @@ public class IndexController {
     @GetMapping("/login")
     public String login(User user) {
         // 替换成 JWT
-        String token = user.getName() + user.getPassword();
+        String token = JwtUtils.generateToken();
         UserInfo.USER_MAP.put(token, user);
         UserInfo.ROLES_MAP.put(user.getName(), new HashSet<>(Collections.singletonList("admin")));
 
-        return "login";
+        return token;
     }
 
     @RequiresRoles(value = {"admin"})
