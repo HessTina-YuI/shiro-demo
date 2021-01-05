@@ -60,7 +60,7 @@ public class StatelessAuthcFilter extends AccessControlFilter {
     }
 
     /**
-     * 错误时同意返回的 http 内容，不确定
+     * 错误时统一返回的 http 内容，不确定
      *
      * @param response
      */

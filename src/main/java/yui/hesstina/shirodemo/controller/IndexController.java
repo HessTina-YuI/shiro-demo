@@ -3,6 +3,7 @@ package yui.hesstina.shirodemo.controller;
 import java.util.Collections;
 import java.util.HashSet;
 
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,8 +33,15 @@ public class IndexController {
         return "login";
     }
 
-    @GetMapping("/test")
-    public String test() {
+    @RequiresRoles(value = {"admin"})
+    @GetMapping("/testAdmin")
+    public String testAdmin() {
+        return "test";
+    }
+
+    @RequiresRoles(value = {"user"})
+    @GetMapping("/testUser")
+    public String testUser() {
         return "test";
     }
 
