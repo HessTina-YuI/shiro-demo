@@ -1,8 +1,10 @@
 package yui.hesstina.shirodemo.constant;
 
-import yui.hesstina.shirodemo.pojo.User;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
+import yui.hesstina.shirodemo.pojo.User;
 
 /**
  * 自测时写死，实际会用缓存替代
@@ -16,17 +18,26 @@ import java.util.*;
 public class UserInfo {
 
     /**
-     * 登录的时候，存入缓存？
+     * 生成的 token
+     *
      * key: 生成的 token
      * value: 用户信息
      */
     public static final Map<String, User> USER_MAP = new HashMap<>();
 
     /**
-     * 登录后，从数据库中获得权限，存入缓存？
+     * 角色
+     *
      * key: 用户名
-     * value: 权限（可以有多个）
+     * value: 角色
      */
     public static final Map<String, Set<String>> ROLES_MAP = new HashMap<>();
 
+    /**
+     * 权限控制
+     *
+     * key: 用户名
+     * value: 权限
+     */
+    public static final Map<String, Set<String>> PERMISSION_MAP = new HashMap<>();
 }

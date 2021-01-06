@@ -1,19 +1,24 @@
 package yui.hesstina.shirodemo.util;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import lombok.Data;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+
 import org.apache.shiro.util.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Date;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
+import lombok.Data;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @package yui.hesstina.shirodemo.util
@@ -28,32 +33,41 @@ import java.util.Date;
 public class JwtUtils {
 
     /**
-     * 校验token是否正确
-     * @param token Token
-     * @return boolean 是否正确
+     * 根据 token 获得签发人的信息
+     *
+     * @param token token
+     * @return 签发人名字 {@link String}
      */
-    public static boolean verify(String token) {
-        try {
-            JWTVerifier verifier = JWT.require(generateAlgorithm())
-                    .withIssuer("auth0")
-                    .build();
-            verifier.verify(token);
-            return true;
-        } catch (JWTVerificationException e) {
-            log.error("JWTToken 解密失败:", e);
+    public static String getIssuer(String token) {
+        DecodedJWT jwt = verifierToken(token);
+
+        return jwt != null ? jwt.getIssuer() : "";
+    }
+
+    /**
+     * 根据 token 获得签发时间
+     *
+     * @param token token
+     * @return 签发时间 {@link LocalDate}
+     */
+    public static LocalDate getIssuerDate(String token) {
+        DecodedJWT jwt = verifierToken(token);
+        if (jwt != null) {
+            Date date = jwt.getIssuedAt();
+            return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         }
 
-        return false;
+        return null;
     }
 
     /**
      * 生成 jwt token
      * @return token
      */
-    public static String generateToken() {
+    public static String generateToken(String userName) {
         try {
             return JWT.create()
-                    .withIssuer("auth0")
+                    .withIssuer(userName)
                     .withIssuedAt(new Date())
                     .sign(generateAlgorithm());
         } catch (IllegalArgumentException | JWTCreationException e) {
@@ -61,6 +75,18 @@ public class JwtUtils {
         }
 
         return StringUtils.EMPTY_STRING;
+    }
+
+    private static DecodedJWT verifierToken(String token) {
+        DecodedJWT jwt = null;
+        try {
+            JWTVerifier verifier = JWT.require(generateAlgorithm()).build();
+            jwt = verifier.verify(token);
+        } catch (JWTVerificationException e) {
+            log.info("jwt 解码失败, token: {}", token, e);
+        }
+
+        return jwt;
     }
 
     private static Algorithm generateAlgorithm() {

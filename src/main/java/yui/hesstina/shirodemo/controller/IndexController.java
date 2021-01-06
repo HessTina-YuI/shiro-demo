@@ -1,15 +1,16 @@
 package yui.hesstina.shirodemo.controller;
 
-import org.apache.shiro.authz.annotation.RequiresRoles;
+import java.util.Collections;
+import java.util.HashSet;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import yui.hesstina.shirodemo.constant.UserInfo;
 import yui.hesstina.shirodemo.pojo.User;
 import yui.hesstina.shirodemo.util.JwtUtils;
-
-import java.util.Collections;
-import java.util.HashSet;
 
 /**
  * @package yui.hesstina.shirodemo.controller
@@ -26,23 +27,29 @@ public class IndexController {
     @GetMapping("/login")
     public String login(User user) {
         // 替换成 JWT
-        String token = JwtUtils.generateToken();
+        String token = JwtUtils.generateToken(user.getName());
         UserInfo.USER_MAP.put(token, user);
-        UserInfo.ROLES_MAP.put(user.getName(), new HashSet<>(Collections.singletonList("admin")));
+        UserInfo.PERMISSION_MAP.put(user.getName(), new HashSet<>(Collections.singleton("sys:test:*")));
 
         return token;
     }
 
-    @RequiresRoles(value = {"admin"})
+    @RequiresPermissions("sys:test:admin")
     @GetMapping("/testAdmin")
     public String testAdmin() {
         return "test";
     }
 
-    @RequiresRoles(value = {"user"})
+
+    @RequiresPermissions("sys:test:user")
     @GetMapping("/testUser")
     public String testUser() {
         return "test";
     }
 
+    @RequiresPermissions("sys:audience")
+    @GetMapping("/audience")
+    public String testAudience() {
+        return "test";
+    }
 }

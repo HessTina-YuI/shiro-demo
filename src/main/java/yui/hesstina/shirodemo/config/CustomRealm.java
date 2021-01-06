@@ -1,5 +1,7 @@
 package yui.hesstina.shirodemo.config;
 
+import java.util.Set;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -9,12 +11,10 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.util.ObjectUtils;
+
 import yui.hesstina.shirodemo.bean.StatelessToken;
 import yui.hesstina.shirodemo.constant.UserInfo;
-import yui.hesstina.shirodemo.pojo.User;
 import yui.hesstina.shirodemo.util.JwtUtils;
-
-import java.util.Set;
 
 /**
  * 自定义 realm
@@ -43,6 +43,13 @@ public class CustomRealm extends AuthorizingRealm {
 
         SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
         simpleAuthorizationInfo.setRoles(roles);
+
+        Set<String> permissions = UserInfo.PERMISSION_MAP.get(userName);
+        if (ObjectUtils.isEmpty(permissions)) {
+            return null;
+        }
+        simpleAuthorizationInfo.setStringPermissions(permissions);
+
         return simpleAuthorizationInfo;
     }
 
@@ -54,17 +61,10 @@ public class CustomRealm extends AuthorizingRealm {
             return null;
         }
 
-        if (!JwtUtils.verify(token.getToken())) {
-            return null;
-        }
+        String userName = JwtUtils.getIssuer(token.getToken());
 
-        User user = UserInfo.USER_MAP.get(token.getToken());
-        if (ObjectUtils.isEmpty(user)) {
-            return null;
-        }
+        token.setUserName(userName);
 
-        token.setUserName(user.getName());
-
-        return new SimpleAuthenticationInfo(user.getName(), token.getToken(), this.getName());
+        return new SimpleAuthenticationInfo(userName, token.getToken(), this.getName());
     }
 }

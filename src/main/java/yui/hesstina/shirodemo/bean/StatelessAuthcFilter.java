@@ -51,11 +51,6 @@ public class StatelessAuthcFilter extends AccessControlFilter {
             return false;
         }
 
-        // 权限判断是否能使用资源，先这么写，看看能不能改成 aop 或者别的方式
-        if (subject.hasRole("admin")) {
-            System.out.println("admin");
-        }
-
         return true;
     }
 
